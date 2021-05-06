@@ -1,0 +1,34 @@
+{
+    "_id": "_design/generalAnalysis",
+    "_rev": "26-15457583cc6f383ca2acf70d1c53acaa",
+    "views": {
+      "vulgar_is_political": {
+        "map": "function (doc) {\n  emit([doc.doc.is_political,doc.doc.vulgarity], 1);\n}",
+        "reduce": "_count"
+      },
+      "emoji_is_political_count": {
+        "map": "function (doc) {\n  //([is_political, emoji length(int))\n  emit([doc.doc.is_political], doc.doc.emojis.length);\n}",
+        "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length\n        return [sum(values) / length, length]\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length)\n        }));\n        return [avg, length]\n    }\n}"
+      },
+      "emoji_is_political_ave": {
+        "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}",
+        "map": "function (doc) {\n  //([is_political, emoji length(int))\n  emit([doc.doc.is_political], doc.doc.emojis.length);\n}"
+      },
+      "sentiment_is_political_ave": {
+        "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}",
+        "map": "function (doc) {\n  //([is_political, emoji length(int))\n  emit([doc.doc.is_political], doc.doc.sentiment_score);\n}"
+      },
+      "vulg_lab_lib": {
+        "map": "function (doc) {\n   if (doc.doc.vulgarity) {\n  key2 = 'vulgar';\n} else {\n  key2 = \"liberal\";\n}\n  \n  if (doc.doc.is_labor) {\n  key1 = 'labor';\n  emit([key1,key2], 1);\n  \n} else if (doc.doc.is_liberal){\n  key1 = \"liberal\";\n  emit([key1,key2], 1);\n}\n  \n}",
+        "reduce": "_count"
+      },
+      "emoji_lab_lib": {
+        "map": "function (doc) {\n  if (doc.doc.is_labor) {\n  key1 = 'labor';\n  emit([key1], doc.doc.emojis.length);\n} else if (doc.doc.is_liberal){\n  key1 = \"liberal\";\n  emit([key1], doc.doc.emojis.length);\n}\n}"
+      },
+      "sentiment_lab_lib": {
+        "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}",
+        "map": "function (doc) {\n  if (doc.doc.is_labor) {\n  key1 = 'labor';\n  emit([key1],doc.doc.sentiment_score);\n} else if (doc.doc.is_liberal){\n  key1 = \"liberal\";\n  emit([key1],doc.doc.sentiment_score);\n}\n}"
+      }
+    },
+    "language": "javascript"
+  }

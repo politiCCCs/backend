@@ -1,0 +1,39 @@
+{
+    "_id": "_design/numVotesCorr",
+    "_rev": "32-9639bfd327f519047faa8eea1f07d482",
+    "views": {
+      "retweet": {
+        "reduce": "_stats",
+        "map": "function (doc) {\n  emit([doc.full_tweet.user.screen_name], doc.retweet_count);\n}"
+      },
+      "likes": {
+        "map": "function (doc) {\n  emit([doc.full_tweet.user.screen_name], doc.likes);\n}",
+        "reduce": "_stats"
+      },
+      "count": {
+        "map": "function (doc) {\n  emit([doc.full_tweet.user.screen_name], 1);\n}",
+        "reduce": "_count"
+      },
+      "sentiment": {
+        "reduce": "_stats",
+        "map": "function (doc) {\n  emit([doc.full_tweet.user.screen_name], doc.sentiment_score);\n}"
+      },
+      "retweet_ave": {
+        "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}",
+        "map": "function (doc) {\n  emit([doc.full_tweet.user.screen_name], doc.retweet_count);\n}"
+      },
+      "sentiment_ave": {
+        "reduce": "_stats",
+        "map": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}"
+      },
+      "likes_ave": {
+        "map": "function (doc) {\n  emit([doc.full_tweet.user.screen_name], doc.likes);\n}",
+        "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}"
+      },
+      "count_ave": {
+        "map": "function (doc) {\n  emit([doc.full_tweet.user.screen_name], 1);\n}",
+        "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}"
+      }
+    },
+    "language": "javascript"
+  }
