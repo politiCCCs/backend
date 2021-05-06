@@ -64,7 +64,7 @@ const dbName = 'tweets_db';
 
 
 
-//Views below are added!
+//Below are querying views. Views have all been uploaded through JSON directly into couchdb. 
 
 app.get('/', function(req,res){ //takes req and response
     console.log("getting View: Count per username (Politician)")
