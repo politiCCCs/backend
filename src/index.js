@@ -8,81 +8,54 @@ const express = require("express");
 const nano = require("nano")("http://admin:admin@127.0.0.1:5984");
 
 // Constants
-const DATABASE = "tweet_database";
+const DATABASE = "test";
 const LANG_JS = "javascript";
 
-const EXAMPLE_ID = "_design/example";
-const EXAMPLE_VIEWNAME = "emit_all";
+// const EXAMPLE_ID = "_design/example";
+// const EXAMPLE_VIEWNAME = "emit_all";
 
-const SENTIMENT_ID = "_design/sentiment";
-const SENTIMENT_VIEWNAME = "sentiment_by_isleader";
+// const SENTIMENT_ID = "_design/sentiment";
+// const SENTIMENT_VIEWNAME = "sentiment_by_isleader";
 
-const VULGARITY_ID = "_design/vulgarity";
-const VULGARITY_VIEWNAME = "bydate";
+// const VULGARITY_ID = "_design/vulgarity";
+// const VULGARITY_VIEWNAME = "bydate";
 
-async function initMapReduce() {
-  console.log("Initialising map reduce");
-  const db = nano.use(DATABASE);
+const NodeCouchDb = require("node-couchdb"); // npm install express body-parser ejs node-couchdb --save
 
-  // Example view
-  const exampleDdoc = {
-    _id: EXAMPLE_ID,
-    views: {
-      [EXAMPLE_VIEWNAME]: {
-        map: function (doc) {
-          emit(doc._id, 1);
-        }.toString(),
-      },
-    },
-    language: LANG_JS,
-  };
-  await db.insert(exampleDdoc);
-  console.log("Inserted example view");
+// async function initMapReduce() {
+//   console.log("Initialising map reduce");
+//   const db = nano.use(DATABASE);
 
-  // Average sentiment score for political leaders vs. non-leaders
-  await db.insert({
-    _id: SENTIMENT_ID,
-    views: {
-      [SENTIMENT_VIEWNAME]: {
-        map: function (keys, values, rereduce) {
-          if (rereduce) {
-            return sum(values);
-          } else {
-            return values.length;
-          }
-        }.toString(),
-      },
-    },
-    language: LANG_JS,
-  });
-  console.log("Inserted sentiment score view");
+  // // Example view
+  // const exampleDdoc = {
+  //   _id: EXAMPLE_ID,
+  //   views: {
+  //     [retweet]: {
+  //       map: function (doc) {
 
-  // Vulgarity by leader or not
-  await db.insert({
-    _id: VULGARITY_ID,
-    views: {
-      [VULGARITY_VIEWNAME]: {
-        reduce: "_count",
-        map: function (doc) {
-          emit(doc.is_leader, +doc.vulgarity);
-        }.toString(),
-      },
-    },
-    language: LANG_JS,
-  });
-  console.log("Inserted vulgarity by leader view");
-}
+  //         emit([doc.full_tweet.user.screen_name], doc.retweet_count);
+
+  //       }.toString(),
+  //     },
+  //   },
+  //   language: LANG_JS,
+  // };
+  // await db.insert(exampleDdoc);
+  // console.log("Inserted example view");
+
 
 async function main() {
-  try {
-    await initMapReduce();
-  } catch (error) {
-    console.error(error);
-  }
+  // try {
+  //   await initMapReduce();
+  // } catch (error) {
+  //   console.error(error);
+  // }
 
   console.log("Initialising Express");
   const app = express();
   app.use(express.json());
+
+  const dbName = 'tweets_database_6%2F7%2F2021';
 
   app.get("/", async (_req, res) => {
     const db = nano.use(DATABASE);
@@ -127,7 +100,28 @@ async function main() {
     return;
   });
 
-  app.listen(3000, () => {
+
+  app.get('/', function(req,res){ //takes req and response
+    //res.send('Working...');
+    couch.get(dbName, '_design/query-demo/_view/full-name').then(
+        //If success!
+        function(data, headers, status){ 
+            console.log(data.data.rows)
+            // console.log(data);
+            res.render('index',{ //render view with res.render
+                // tweet_database2:data.data.rows //pass along data that was returned.
+                tweet:data.data.rows
+            });
+        },
+        //error
+        function(err){
+            //if an error, pass through error
+            console.log(err)
+            res.send(err);
+        });
+});
+
+  app.listen(3003, () => {
     console.log("Listening on port 3000");
   });
 }
