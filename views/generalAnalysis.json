@@ -1,6 +1,5 @@
 {
   "_id": "_design/generalAnalysis",
-  "_rev": "48-9fa2b81bdee6108cba08c7021984d7d6",
   "views": {
     "emoji_is_political_ave_no_polis": {
       "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}",
