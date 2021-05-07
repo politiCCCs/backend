@@ -231,6 +231,3 @@ app.get('/', function(req,res){ //takes req and response
 app.listen('3001', function(){
     console.log('Server Started on Port 3001');
 });
-
-
-
