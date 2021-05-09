@@ -56,7 +56,7 @@ app.use(express.json());
 
 // Below are querying views. Views have all been uploaded through JSON directly into couchdb.
 
-app.get("/", function (_req, res) {
+app.get("/count-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Count per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/count?group=true").then(
@@ -78,7 +78,7 @@ app.get("/", function (_req, res) {
   );
 });
 
-app.get("/", function (_req, res) {
+app.get("/avg-count-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Average Count per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/count_ave?group=true").then(
@@ -100,7 +100,7 @@ app.get("/", function (_req, res) {
   );
 });
 
-app.get("/", function (_req, res) {
+app.get("/likes-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Likes per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/likes?group=true").then(
@@ -122,7 +122,7 @@ app.get("/", function (_req, res) {
   );
 });
 
-app.get("/", function (_req, res) {
+app.get("/avg-likes-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Average Likes per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/likes_ave?group=true").then(
@@ -144,7 +144,7 @@ app.get("/", function (_req, res) {
   );
 });
 
-app.get("/", function (_req, res) {
+app.get("/retweets-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Retweets per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/retweet?group=true").then(
@@ -166,7 +166,7 @@ app.get("/", function (_req, res) {
   );
 });
 
-app.get("/", function (_req, res) {
+app.get("/avg-retweets-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Average Retweets per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/retweet_ave?group=true").then(
@@ -188,7 +188,7 @@ app.get("/", function (_req, res) {
   );
 });
 
-app.get("/", function (_req, res) {
+app.get("/sentiment-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Sentiment per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/sentiment?group=true").then(
@@ -210,7 +210,7 @@ app.get("/", function (_req, res) {
   );
 });
 
-app.get("/", function (_req, res) {
+app.get("/svg-sentiment-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Average Sentiment per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/sentiment_ave?group=true").then(
