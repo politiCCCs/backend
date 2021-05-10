@@ -1,3 +1,5 @@
+const fs = require("fs");
+const util = require("util");
 const express = require("express");
 const NodeCouchDb = require("node-couchdb");
 
@@ -26,6 +28,8 @@ couch.listDatabases().then(function (dbs) {
 
 const app = express();
 app.use(express.json());
+
+const dbName = "tweets_db";
 
 /**
  * The view below has already been set up manually.
@@ -62,12 +66,7 @@ app.get("/count-per-politician", function (_req, res) {
   couch.get(dbName, "_design/numVotesCorr/_view/count?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -84,12 +83,7 @@ app.get("/avg-count-per-politician", function (_req, res) {
   couch.get(dbName, "_design/numVotesCorr/_view/count_ave?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -106,12 +100,7 @@ app.get("/likes-per-politician", function (_req, res) {
   couch.get(dbName, "_design/numVotesCorr/_view/likes?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -128,12 +117,7 @@ app.get("/avg-likes-per-politician", function (_req, res) {
   couch.get(dbName, "_design/numVotesCorr/_view/likes_ave?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -150,12 +134,7 @@ app.get("/retweets-per-politician", function (_req, res) {
   couch.get(dbName, "_design/numVotesCorr/_view/retweet?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -172,12 +151,7 @@ app.get("/avg-retweets-per-politician", function (_req, res) {
   couch.get(dbName, "_design/numVotesCorr/_view/retweet_ave?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -194,12 +168,7 @@ app.get("/sentiment-per-politician", function (_req, res) {
   couch.get(dbName, "_design/numVotesCorr/_view/sentiment?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -210,18 +179,13 @@ app.get("/sentiment-per-politician", function (_req, res) {
   );
 });
 
-app.get("/svg-sentiment-per-politician", function (_req, res) {
+app.get("/avg-sentiment-per-politician", function (_req, res) {
   //takes req and response
   console.log("getting View: Average Sentiment per username (Politician)");
   couch.get(dbName, "_design/numVotesCorr/_view/sentiment_ave?group=true").then(
     //If success!
     function (data) {
-      console.log(data.data.rows);
-      // console.log(data);
-      // res.render('index',{ //render view with res.render
-      //     // tweet_database2:data.data.rows //pass along data that was returned.
-      //     tweetv2:data.data.rows
-      // });
+      res.send(data);
     },
     //error
     function (err) {
@@ -232,6 +196,19 @@ app.get("/svg-sentiment-per-politician", function (_req, res) {
   );
 });
 
-app.listen("3001", () => {
-  console.log("Server Started on Port 3001");
+const readFilePromise = util.promisify(fs.readFile);
+
+const loadShapeFile = async () => {
+  const data = await readFilePromise("./assets/COM_ELB_region.json");
+  const shapeFile = JSON.parse(data);
+
+  app.get("/shapefile", (_req, res) => {
+    res.send(shapeFile);
+  });
+};
+
+loadShapeFile().then(() => {
+  app.listen("3001", () => {
+    console.log("Server Started on Port 3001");
+  });
 });
