@@ -2,7 +2,6 @@ const fs = require("fs");
 const util = require("util");
 const express = require("express");
 const NodeCouchDb = require("node-couchdb");
-const { response } = require("express");
 
 // Connect to Local db
 // const couch = new NodeCouchDb({
@@ -30,7 +29,7 @@ couch.listDatabases().then(function (dbs) {
 const app = express();
 app.use(express.json());
 
-const dbName = "tweets_db";
+const dbName = "twitter_db";
 
 /**
  * The view below has already been set up manually.
