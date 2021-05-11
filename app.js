@@ -2,6 +2,7 @@ const fs = require("fs");
 const util = require("util");
 const express = require("express");
 const NodeCouchDb = require("node-couchdb");
+const { response } = require("express");
 
 // Connect to Local db
 // const couch = new NodeCouchDb({
@@ -177,10 +178,20 @@ const loadTwoPartyVotes = async () => {
   });
 };
 
+const loadHandleUsernameMap = async () => {
+  const data = await readFilePromise("./assets/handleNameMap.json");
+  const file = JSON.parse(data);
+
+  app.get("/handle-name-map", (_req, res) => {
+    res.send(file);
+  });
+};
+
 Promise.all([
   loadShapeFile(),
   loadVotesByCandidate(),
   loadTwoPartyVotes(),
+  loadHandleUsernameMap(),
 ]).then(() => {
   app.listen("3001", () => {
     console.log("Server Started on Port 3001");
