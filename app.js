@@ -159,7 +159,29 @@ const loadShapeFile = async () => {
   });
 };
 
-loadShapeFile().then(() => {
+const loadVotesByCandidate = async () => {
+  const data = await readFilePromise("./assets/VotesByCandidate.csv");
+
+  app.get("/votes-by-candidate.csv", (_req, res) => {
+    res.header("Content-Type", "text/csv");
+    res.send(data);
+  });
+};
+
+const loadTwoPartyVotes = async () => {
+  const data = await readFilePromise("./assets/TwoPartyVotes.csv");
+
+  app.get("/two-party-votes.csv", (_req, res) => {
+    res.header("Content-Type", "text/csv");
+    res.send(data);
+  });
+};
+
+Promise.all([
+  loadShapeFile(),
+  loadVotesByCandidate(),
+  loadTwoPartyVotes(),
+]).then(() => {
   app.listen("3001", () => {
     console.log("Server Started on Port 3001");
   });
