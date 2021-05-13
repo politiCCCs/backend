@@ -1,6 +1,6 @@
 {
   "_id": "_design/generalAnalysis",
-  "_rev": "8-66750476288f4f0a20d7c5bf41e20f77",
+  "_rev": "9-1bd407f65e763de83d394cee5c0ce76a",
   "views": {
     "emoji_is_political_ave_no_polis": {
       "reduce": "function(keys, values, rereduce) {\n    if (!rereduce) {\n        var length = values.length;\n        return [sum(values) / length, length];\n    } else {\n        var length = sum(values.map(function(v){return v[1]}));\n        var avg = sum(values.map(function(v){\n            return v[0] * (v[1] / length);\n        }));\n        return [avg, length];\n    }\n}",
@@ -43,7 +43,7 @@
       "map": "function (doc) {\n  if (doc.is_labor) {\n  key1 = 'labor';\n  emit([key1],doc.sentiment_score);\n} else if (doc.is_liberals){\n  key1 = \"liberal\";\n  emit([key1],doc.sentiment_score);\n}else if (doc.is_greens){\n  key1 = \"greens\";\n  emit([key1],doc.sentiment_score);\n}\n}"
     },
     "has_geo_sentiment": {
-      "map": "function (doc) {\n  if(doc.geo !== null && doc.geo !== '') {\n   emit([doc.is_labor,doc.is_liberals],1);\n}\n}",
+      "map": "function (doc) {\n  if(doc.geo !== null && doc.geo !== '') {\n   emit([doc.is_labor,doc.is_liberals],doc.geo);\n}\n}",
       "reduce": "_stats"
     },
     "amelia_political_is_leader": {
