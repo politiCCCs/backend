@@ -149,6 +149,25 @@ politicianRouter
 app.use("/politicians", politicianRouter);
 //#endregion
 
+//#region Global comparison
+const globalRouter = express.Router();
+const globalView = (view) =>
+  `_design/generalAnalysisNew/_view/${view}?group=true`;
+
+globalRouter.get("/sentiment", (_req, res) => {
+  console.log("getting View: Sentiment (Labor vs. Liberal)");
+  couch.get(dbName, globalView`sentiment_lab_lib`).then(
+    (data) => res.send(data),
+    (err) => {
+      console.log(err);
+      res.send(err);
+    }
+  );
+});
+
+app.use("/global", globalRouter);
+//#endregion
+
 const readFilePromise = util.promisify(fs.readFile);
 
 const loadShapeFile = async () => {
