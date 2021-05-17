@@ -2,6 +2,7 @@ const fs = require("fs");
 const util = require("util");
 const express = require("express");
 const NodeCouchDb = require("node-couchdb");
+const processGeoLocation = require("./geolocation");
 
 // Connect to Local db
 // const couch = new NodeCouchDb({
@@ -163,16 +164,7 @@ globalRouter
 app.use("/general", globalRouter);
 //#endregion
 
-//#region Geolocation tweets
-app.get("/geolocation", (_req, res) => {
-  sendView(
-    "Geolocation",
-    dbName,
-    `_design/geoEnabled/_view/geo_lab_lib`,
-    res
-  );
-});
-//#endregion
+
 
 const readFilePromise = util.promisify(fs.readFile);
 
@@ -182,6 +174,18 @@ const loadShapeFile = async () => {
 
   app.get("/shapefile", (_req, res) => {
     res.send(shapeFile);
+  });
+
+  app.get("/geolocation", (_req, res) => {
+    console.log(`getting View: Geolocation`);
+
+    couch.get(dbName, `_design/geoEnabled/_view/geo_lab_lib`).then(
+      (payload) => res.send(processGeoLocation(shapeFile, payload.data)),
+      (err) => {
+        console.log(err);
+        res.send(err);
+      }
+    );
   });
 };
 
