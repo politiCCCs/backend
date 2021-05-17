@@ -163,6 +163,17 @@ globalRouter
 app.use("/general", globalRouter);
 //#endregion
 
+//#region Geolocation tweets
+app.get("/geolocation", (_req, res) => {
+  sendView(
+    "Geolocation",
+    dbName,
+    `_design/geoEnabled/_view/geo_lab_lib`,
+    res
+  );
+});
+//#endregion
+
 const readFilePromise = util.promisify(fs.readFile);
 
 const loadShapeFile = async () => {
