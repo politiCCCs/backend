@@ -60,89 +60,85 @@ const dbName = "twitter_db";
 
 // Below are querying views. Views have all been uploaded through JSON directly into couchdb.
 
+const sendView = (cleanViewName, dbName, view, res) => {
+  console.log(`getting View: ${cleanViewName}`);
+
+  couch.get(dbName, view).then(
+    (data) => res.send(data),
+    (err) => {
+      console.log(err);
+      res.send(err);
+    }
+  );
+};
+
 //#region Politician data
 const politicians = (view) => `_design/numVotesCorr/_view/${view}?group=true`;
 const politicianRouter = express.Router();
 
 politicianRouter
   .get("/count", (_req, res) => {
-    console.log("getting View: Count per username (Politician)");
-    couch.get(dbName, politicians`count`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Count per username (Politician)",
+      dbName,
+      politicians`count`,
+      res
     );
   })
   .get("/avg-count", (_req, res) => {
-    console.log("getting View: Average Count per username (Politician)");
-    couch.get(dbName, politicians`count_ave`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Average Count per username (Politician)",
+      dbName,
+      politicians`count_ave`,
+      res
     );
   })
   .get("/likes", (_req, res) => {
-    console.log("getting View: Likes per username (Politician)");
-    couch.get(dbName, politicians`likes`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Likes per username (Politician)",
+      dbName,
+      politicians`likes`,
+      res
     );
   })
   .get("/avg-likes", (_req, res) => {
-    console.log("getting View: Average Likes per username (Politician)");
-    couch.get(dbName, politicians`likes_ave`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Average Likes per username (Politician)",
+      dbName,
+      politicians`likes_ave`,
+      res
     );
   })
   .get("/retweets", (_req, res) => {
-    console.log("getting View: Retweets per username (Politician)");
-    couch.get(dbName, politicians`retweet`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Retweets per username (Politician)",
+      dbName,
+      politicians`retweet`,
+      res
     );
   })
   .get("/avg-retweets", (_req, res) => {
-    console.log("getting View: Average Retweets per username (Politician)");
-    couch.get(dbName, politicians`retweet_ave`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Average Retweets per username (Politician)",
+      dbName,
+      politicians`retweet_ave`,
+      res
     );
   })
   .get("/sentiment", (_req, res) => {
-    console.log("getting View: Sentiment per username (Politician)");
-    couch.get(dbName, politicians`sentiment`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Sentiment per username (Politician)",
+      dbName,
+      politicians`sentiment`,
+      res
     );
   })
   .get("/avg-sentiment", (_req, res) => {
-    console.log("getting View: Average Sentiment per username (Politician)");
-    couch.get(dbName, politicians`sentiment_ave`).then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
+    sendView(
+      "Average Sentiment per username (Politician)",
+      dbName,
+      politicians`sentiment_ave`,
+      res
     );
   });
 
@@ -151,20 +147,17 @@ app.use("/politicians", politicianRouter);
 
 //#region Global comparison
 const globalRouter = express.Router();
+const nonPoli = (s) => `_design/nonPoli/_view/${s}?group=true`;
 
 globalRouter
   .get("/leaders", (_req, res) => {
-    console.log("getting View: Leaders");
-    couch.get(dbName, "_design/nonPoli/_view/all_groups_values_all_stats?group=true").then(
-      (data) => res.send(data),
-      (err) => {
-        console.log(err);
-        res.send(err);
-      }
-    );
+    sendView("Leaders", dbName, nonPoli`all_groups_values_all_stats`, res);
   })
+  .get("/vulgarity", (_req, res) => {
+    sendView("Vulgarity", dbName, nonPoli`count_vulgarity`, res);
+  });
 
-app.use("/global", globalRouter);
+app.use("/general", globalRouter);
 //#endregion
 
 const readFilePromise = util.promisify(fs.readFile);
