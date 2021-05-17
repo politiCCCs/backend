@@ -155,6 +155,9 @@ globalRouter
   })
   .get("/vulgarity", (_req, res) => {
     sendView("Vulgarity", dbName, nonPoli`count_vulgarity`, res);
+  })
+  .get("/tweets", (_req, res) => {
+    sendView("Tweets", dbName, nonPoli`count_total`, res);
   });
 
 app.use("/general", globalRouter);
