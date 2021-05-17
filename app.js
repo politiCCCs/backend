@@ -151,19 +151,18 @@ app.use("/politicians", politicianRouter);
 
 //#region Global comparison
 const globalRouter = express.Router();
-const globalView = (view) =>
-  `_design/generalAnalysisNew/_view/${view}?group=true`;
 
-globalRouter.get("/sentiment", (_req, res) => {
-  console.log("getting View: Sentiment (Labor vs. Liberal)");
-  couch.get(dbName, globalView`sentiment_lab_lib`).then(
-    (data) => res.send(data),
-    (err) => {
-      console.log(err);
-      res.send(err);
-    }
-  );
-});
+globalRouter
+  .get("/leaders", (_req, res) => {
+    console.log("getting View: Leaders");
+    couch.get(dbName, "_design/nonPoli/_view/all_groups_values_all_stats?group=true").then(
+      (data) => res.send(data),
+      (err) => {
+        console.log(err);
+        res.send(err);
+      }
+    );
+  })
 
 app.use("/global", globalRouter);
 //#endregion
