@@ -164,8 +164,6 @@ globalRouter
 app.use("/general", globalRouter);
 //#endregion
 
-
-
 const readFilePromise = util.promisify(fs.readFile);
 
 const loadShapeFile = async () => {
@@ -179,8 +177,12 @@ const loadShapeFile = async () => {
   app.get("/geolocation", (_req, res) => {
     console.log(`getting View: Geolocation`);
 
+    const t0 = performance.now();
     couch.get(dbName, `_design/geoEnabled/_view/geo_lab_lib`).then(
-      (payload) => res.send(processGeoLocation(shapeFile, payload.data)),
+      (payload) => {
+        console.log(performance.now() - t0);
+        res.send(processGeoLocation(shapeFile, payload.data));
+      },
       (err) => {
         console.log(err);
         res.send(err);

@@ -15,9 +15,11 @@ const findElectorate = (features, point) => {
 
 const processGeoLocation = (geojson, dbData) => {
   console.log("starting");
+
   console.log(geojson.features.length); // 151 complex geometries
   console.log(dbData.rows.length); // >15K tweets
 
+  const t0 = performance.now();
   const tweets = [];
 
   for (const { key, value: point } of dbData.rows) {
@@ -32,6 +34,8 @@ const processGeoLocation = (geojson, dbData) => {
     }
   }
 
+  const t1 = performance.now();
+  console.log(t1 - t0);
   console.log("done");
   return tweets;
 };
