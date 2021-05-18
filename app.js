@@ -1,7 +1,13 @@
-const fs = require("fs");
-const util = require("util");
+"use strict";
+// @ts-check
+
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const NodeCouchDb = require("node-couchdb");
+const util = require("util");
+
+const dotenv = require("dotenv").config();
 
 // Connect to Local db
 // const couch = new NodeCouchDb({
@@ -165,19 +171,16 @@ app.use("/general", globalRouter);
 
 //#region Geolocation tweets
 app.get("/geolocation", (_req, res) => {
-  sendView(
-    "Geolocation",
-    dbName,
-    `_design/geoEnabled/_view/geo_lab_lib`,
-    res
-  );
+  sendView("Geolocation", dbName, `_design/geoEnabled/_view/geo_lab_lib`, res);
 });
 //#endregion
 
 const readFilePromise = util.promisify(fs.readFile);
 
 const loadShapeFile = async () => {
-  const data = await readFilePromise("./assets/COM_ELB_region.json");
+  const data = await readFilePromise(
+    path.join(__dirname, "./assets/COM_ELB_region.json")
+  );
   const shapeFile = JSON.parse(data);
 
   app.get("/shapefile", (_req, res) => {
@@ -186,7 +189,9 @@ const loadShapeFile = async () => {
 };
 
 const loadVotesByCandidate = async () => {
-  const data = await readFilePromise("./assets/VotesByCandidate.csv");
+  const data = await readFilePromise(
+    path.join(__dirname, "./assets/VotesByCandidate.csv")
+  );
 
   app.get("/votes-by-candidate.csv", (_req, res) => {
     res.header("Content-Type", "text/csv");
@@ -195,7 +200,9 @@ const loadVotesByCandidate = async () => {
 };
 
 const loadTwoPartyVotes = async () => {
-  const data = await readFilePromise("./assets/TwoPartyVotes.csv");
+  const data = await readFilePromise(
+    path.join(__dirname, "./assets/TwoPartyVotes.csv")
+  );
 
   app.get("/two-party-votes.csv", (_req, res) => {
     res.header("Content-Type", "text/csv");
@@ -204,13 +211,26 @@ const loadTwoPartyVotes = async () => {
 };
 
 const loadHandleUsernameMap = async () => {
-  const data = await readFilePromise("./assets/handleNameMap.json");
+  const data = await readFilePromise(
+    path.join(__dirname, "./assets/handleNameMap.json")
+  );
   const file = JSON.parse(data);
 
   app.get("/handle-name-map", (_req, res) => {
     res.send(file);
   });
 };
+
+if (process.env.NODE_ENV === "production") {
+  const getParent = (pathname) => path.dirname(pathname);
+  const frontendBuild = path.join(getParent(__dirname), "frontend", "build");
+
+  app.use(express.static(frontendBuild));
+
+  app.get("/", (_req, res) => {
+    res.sendFile(path.join(frontendBuild, "index.html"));
+  });
+}
 
 Promise.all([
   loadShapeFile(),
