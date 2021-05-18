@@ -35,6 +35,7 @@ couch.listDatabases().then(function (dbs) {
 const app = express();
 app.use(express.json());
 
+// CouchDB
 const dbName = "twitter_db";
 
 /**
@@ -148,7 +149,6 @@ politicianRouter
     );
   });
 
-app.use("/politicians", politicianRouter);
 //#endregion
 
 //#region Global comparison
@@ -166,24 +166,24 @@ globalRouter
     sendView("Tweets", dbName, nonPoli`count_total`, res);
   });
 
-app.use("/general", globalRouter);
 //#endregion
 
 //#region Geolocation tweets
-app.get("/geolocation", (_req, res) => {
+const geoLocationRouter = express.Router();
+geoLocationRouter.get("/", (_req, res) => {
   sendView("Geolocation", dbName, `_design/geoEnabled/_view/geo_lab_lib`, res);
 });
 //#endregion
-
 const readFilePromise = util.promisify(fs.readFile);
 
+const loadFileRouter = express.Router();
 const loadShapeFile = async () => {
   const data = await readFilePromise(
     path.join(__dirname, "./assets/COM_ELB_region.json")
   );
   const shapeFile = JSON.parse(data);
 
-  app.get("/shapefile", (_req, res) => {
+  loadFileRouter.get("/shapefile", (_req, res) => {
     res.send(shapeFile);
   });
 };
@@ -193,7 +193,7 @@ const loadVotesByCandidate = async () => {
     path.join(__dirname, "./assets/VotesByCandidate.csv")
   );
 
-  app.get("/votes-by-candidate.csv", (_req, res) => {
+  loadFileRouter.get("/votes-by-candidate.csv", (_req, res) => {
     res.header("Content-Type", "text/csv");
     res.send(data);
   });
@@ -204,33 +204,32 @@ const loadTwoPartyVotes = async () => {
     path.join(__dirname, "./assets/TwoPartyVotes.csv")
   );
 
-  app.get("/two-party-votes.csv", (_req, res) => {
+  loadFileRouter.get("/two-party-votes.csv", (_req, res) => {
     res.header("Content-Type", "text/csv");
     res.send(data);
   });
 };
 
+const handleNameMapRouter = express.Router();
 const loadHandleUsernameMap = async () => {
   const data = await readFilePromise(
     path.join(__dirname, "./assets/handleNameMap.json")
   );
   const file = JSON.parse(data);
 
-  app.get("/handle-name-map", (_req, res) => {
+  handleNameMapRouter.get("/", (_req, res) => {
     res.send(file);
   });
 };
 
-if (process.env.NODE_ENV === "production") {
-  const getParent = (pathname) => path.dirname(pathname);
-  const frontendBuild = path.join(getParent(__dirname), "frontend", "build");
+const apiRouter = express.Router();
+apiRouter.use("/politicians", politicianRouter);
+apiRouter.use("/general", globalRouter);
+apiRouter.use("/handle-name-map", handleNameMapRouter);
+apiRouter.use("/geolocation", geoLocationRouter);
+apiRouter.use("/load", loadFileRouter);
 
-  app.use(express.static(frontendBuild));
-
-  app.get("/", (_req, res) => {
-    res.sendFile(path.join(frontendBuild, "index.html"));
-  });
-}
+app.use("/api", apiRouter);
 
 Promise.all([
   loadShapeFile(),
@@ -238,6 +237,19 @@ Promise.all([
   loadTwoPartyVotes(),
   loadHandleUsernameMap(),
 ]).then(() => {
+  // Frontend
+  if (process.env.NODE_ENV === "production") {
+    const getParent = (pathname) => path.dirname(pathname);
+    const frontendBuild = path.join(getParent(__dirname), "frontend", "build");
+
+    app.use(express.static(frontendBuild));
+
+    app.get("/*", (_req, res) => {
+      res.sendFile(path.join(frontendBuild, "index.html"));
+    });
+  }
+
+  // Listen
   app.listen("3001", () => {
     console.log("Server Started on Port 3001");
   });
