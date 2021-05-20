@@ -1,0 +1,15 @@
+{
+  "_id": "_design/emoji_test_may_16",
+  "_rev": "1-57a33f3fc8695257a9b7b18ac5391e91",
+  "views": {
+    "count_emojis": {
+      "reduce": "_count",
+      "map": "function (doc) {\n    //Politician stream\n  if(doc.emojis===true){\n    emit([doc.is_leader, doc.is_political, doc.is_labor, doc.is_liberals, doc.is_greens], 1);\n}}"
+    },
+    "count_emojis_test": {
+      "reduce": "_count",
+      "map": "function (doc) {\n    //Politician stream\n  if(doc.emojis===false){\n    emit([doc.is_leader, doc.is_political, doc.is_labor, doc.is_liberals, doc.is_greens], 1);\n}}"
+    }
+  },
+  "language": "javascript"
+}
