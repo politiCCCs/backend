@@ -1,0 +1,23 @@
+{
+  "_id": "_design/nonPoli",
+  "_rev": "14-712d9f5e3287a9aeb42bf927be12c715",
+  "views": {
+    "all_groups_values_all_stats": {
+      "reduce": "_stats",
+      "map": "function (doc) {\n  // \n  //emit([doc.is_leader, doc.is_political, doc.is_labor, doc.is_liberals, doc.is_greens], doc.sentiment_score);\n  //emit([doc.is_leader], doc.retweet_count);\n  if (Number.isInteger(doc.sentiment_score) === true) {\n    emit([doc.is_leader, doc.is_political, doc.is_labor, doc.is_liberals, doc.is_greens], [doc.sentiment_score, doc.retweet_count, doc.likes]);\n}\n}"
+    },
+    "count_emojis": {
+      "reduce": "_count",
+      "map": "function (doc) {\n    //Politician stream\n  if(doc.emojis===true){\n    emit([doc.is_leader, doc.is_political, doc.is_labor, doc.is_liberals, doc.is_greens], 1);\n}}"
+    },
+    "count_vulgarity": {
+      "reduce": "_count",
+      "map": "function (doc) {\n    //Politician stream\n  if(doc.vulgarity===true){\n    emit([doc.is_leader, doc.is_political, doc.is_labor, doc.is_liberals, doc.is_greens], 1);\n}}"
+    },
+    "count_total": {
+      "reduce": "_count",
+      "map": "function (doc) {\n    //Politician stream\n\n  emit([doc.is_leader, doc.is_political, doc.is_labor, doc.is_liberals, doc.is_greens], 1);\n}"
+    }
+  },
+  "language": "javascript"
+}
