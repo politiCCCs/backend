@@ -1,6 +1,6 @@
 {
   "_id": "_design/numVotesCorr",
-  "_rev": "11-e65ee0e9d814007d4007ddfbaa2f594e",
+  "_rev": "12-5acd6e2d62f26d68c69c566bee6cf03d",
   "views": {
     "retweet": {
       "reduce": "_stats",
