@@ -1,0 +1,16 @@
+{
+  "_id": "_design/geoEnabled",
+  "_rev": "7-fdf5a747e1b465e6c66c759dedb7a3bf",
+  "views": {
+    "geo_all_details": {
+      "map": "function (doc) {\n  if(doc.geo !== null && doc.geo !== '' && Number.isInteger(doc.sentiment_score) === true) {\n    emit([doc.is_leader, doc.is_political, (doc.is_labor, doc.is_liberals, doc.is_greens),doc.geo], [doc.sentiment_score, doc.retweet_count, doc.likes]);\n}\n}"
+    },
+    "geo_lab_lib": {
+      "map": "function (doc) {\n  if(doc.geo !== null && doc.geo !== '' ) {\n   emit([doc.is_labor,doc.is_liberals], doc.geo);\n}\n}"
+    },
+    "geo_lab_lib_greens": {
+      "map": "function (doc) {\n  if(doc.geo !== null && doc.geo !== '' ) {\n   emit([doc.isLabor,doc.isLiberals,doc.isGreens], doc.geo);\n}\n}"
+    }
+  },
+  "language": "javascript"
+}
