@@ -6,16 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const NodeCouchDb = require("node-couchdb");
 const util = require("util");
-
-const dotenv = require("dotenv").config();
-
-// Connect to Local db
-// const couch = new NodeCouchDb({
-//     auth:{
-//         user:'admin',
-//         password:'admin'
-//     }
-// });
+require("dotenv").config();
 
 //Connecting to external db
 const couch = new NodeCouchDb({
@@ -38,35 +29,7 @@ app.use(express.json());
 // CouchDB
 const dbName = "twitter_db";
 
-/**
- * The view below has already been set up manually.
- * View 1. ALL tweets
- * http://127.0.0.1:5984/tweet_database2/_design/general1/_view/may6test
- **/
-
-// const viewUrl = '_design/general1/_view/may6test';
-// // create first route to index page
-// app.get('/', function(req,res){ //takes req and response
-//     //res.send('Working...');
-//     couch.get(dbName, viewUrl).then(
-//         //If success!
-//         function(data){
-//             console.log(data.data.rows)
-//             // console.log(data);
-//             res.render('index',{ //render view with res.render
-//                 // tweet_database2:data.data.rows //pass along data that was returned.
-//                 tweet:data.data.rows
-//             });
-//         },
-//         //error
-//         function(err){
-//             //if an error, pass through error
-//             res.send(err);
-//         });
-// });
-
 // Below are querying views. Views have all been uploaded through JSON directly into couchdb.
-
 const sendView = (cleanViewName, dbName, view, res) => {
   console.log(`getting View: ${cleanViewName}`);
 
